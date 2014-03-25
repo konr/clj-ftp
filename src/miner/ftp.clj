@@ -15,6 +15,7 @@
            (java.net URL URLDecoder)
            (java.io File IOException))
   (:require [me.raynes.fs :as fs]
+            [clojure.tools.logging :refer [error]]
             [clojure.string :as str]
 	    [clojure.java.io :as io]))
 
@@ -30,7 +31,7 @@
       (if (not (FTPReply/isPositiveCompletion reply))
         (do (.disconnect client)
             ;; should log instead of println
-            (println "Connection refused")
+            (error "Connection refused")
             nil)
         client))))
 
@@ -81,7 +82,7 @@
            (.enterLocalActiveMode ~client)
            (.enterLocalPassiveMode ~client))
          ~@body
-         (catch IOException e# (println (.getMessage e#)) (throw e#))
+         (catch IOException e# (error e# (.getMessage e#)) (throw e#))
          (finally (when (.isConnected ~client)
                     (try
                       (.disconnect ~client)
